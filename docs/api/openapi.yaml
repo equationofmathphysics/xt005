@@ -1,0 +1,1234 @@
+openapi: 3.1.0
+info:
+  title: codexws HTTP API
+  version: 3.0.0
+  description: 'Current same-origin API for the one shared codexws backend process.
+
+    This contract documents deployed paths; it is not the proposed /api/v1 design.
+
+    '
+servers:
+- url: /
+tags:
+- name: system
+- name: workspaces
+- name: terminals
+- name: conversations
+- name: files
+- name: observations
+paths:
+  /api/check:
+    get:
+      tags:
+      - system
+      operationId: getHealth
+      responses:
+        '200':
+          description: Backend is running.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                properties:
+                  ok:
+                    type: boolean
+                    const: true
+  /api/fs-dirs:
+    get:
+      tags:
+      - system
+      operationId: listDirectories
+      parameters:
+      - name: path
+        in: query
+        schema:
+          type: string
+          default: '~'
+      responses:
+        '200':
+          description: Directories below the selected filesystem path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectoryListing'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/system-stats:
+    get:
+      tags:
+      - system
+      operationId: getSystemStats
+      responses:
+        '200':
+          description: Process, host, workspace, and terminal summaries.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/workspaces:
+    get:
+      tags:
+      - workspaces
+      operationId: listWorkspaces
+      responses:
+        '200':
+          description: All shared workspaces in display order.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - workspaces
+                properties:
+                  workspaces:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+  /api/workspaces/register:
+    post:
+      tags:
+      - workspaces
+      operationId: registerWorkspace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - path
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                path:
+                  type: string
+                create:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Registered workspace and initial terminal.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - workspace
+                properties:
+                  ok:
+                    type: boolean
+                  workspace:
+                    $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /api/workspaces/close:
+    post:
+      tags:
+      - workspaces
+      operationId: closeWorkspace
+      requestBody:
+        $ref: '#/components/requestBodies/WorkspaceSelector'
+      responses:
+        '200':
+          description: Workspace terminals are closed and the registration is hidden
+            or removed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - workspace_id
+                - workspaces
+                properties:
+                  ok:
+                    type: boolean
+                  workspace_id:
+                    type: string
+                  removed:
+                    type: boolean
+                  workspaces:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspaces/reorder:
+    post:
+      tags:
+      - workspaces
+      operationId: reorderWorkspaces
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - order
+              properties:
+                order:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Updated workspace order.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - order
+                - workspaces
+                properties:
+                  ok:
+                    type: boolean
+                  order:
+                    type: array
+                    items:
+                      type: string
+                  workspaces:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-agent/restart:
+    post:
+      tags:
+      - workspaces
+      operationId: restartWorkspaceAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - workspace_id
+              properties:
+                workspace_id:
+                  type: string
+                thread_id:
+                  type: string
+      responses:
+        '200':
+          description: Workspace agent restart was requested.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - workspace_id
+                - agent_command
+                properties:
+                  ok:
+                    type: boolean
+                  workspace_id:
+                    type: string
+                  agent_command:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-terminals:
+    get:
+      tags:
+      - terminals
+      operationId: listWorkspaceTerminals
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      responses:
+        '200':
+          description: Runtime terminal summaries for one workspace.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - workspace
+                - terminals
+                properties:
+                  workspace:
+                    $ref: '#/components/schemas/Workspace'
+                  terminals:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Terminal'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-terminals/create:
+    post:
+      tags:
+      - terminals
+      operationId: createTerminal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTerminalCommand'
+      responses:
+        '200':
+          description: Created terminal and updated workspace summary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalCommandResult'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-terminals/resume:
+    post:
+      tags:
+      - terminals
+      - conversations
+      operationId: resumeConversationTerminal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CreateTerminalCommand'
+              - type: object
+                required:
+                - thread_id
+                properties:
+                  thread_id:
+                    type: string
+      responses:
+        '200':
+          description: Reused or created a terminal and queued at most one resume
+            command.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/TerminalCommandResult'
+                - type: object
+                  properties:
+                    created:
+                      type: boolean
+                    reused:
+                      type: boolean
+                    resume_started:
+                      type: boolean
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-terminals/close:
+    post:
+      tags:
+      - terminals
+      operationId: closeTerminal
+      requestBody:
+        $ref: '#/components/requestBodies/TerminalSelector'
+      responses:
+        '200':
+          description: Terminal process was closed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - workspace_id
+                - terminal_id
+                properties:
+                  ok:
+                    type: boolean
+                  workspace_id:
+                    type: string
+                  terminal_id:
+                    type: string
+                  workspace:
+                    $ref: '#/components/schemas/Workspace'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-terminals/rename:
+    post:
+      tags:
+      - terminals
+      operationId: renameTerminal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/TerminalSelector'
+              - type: object
+                required:
+                - name
+                properties:
+                  name:
+                    type: string
+                    maxLength: 80
+      responses:
+        '200':
+          description: Renamed terminal summary.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalCommandResult'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/terminal-buffer:
+    get:
+      tags:
+      - terminals
+      operationId: getTerminalBuffer
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/TerminalId'
+      - name: after
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: before
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: Absolute-offset slice of terminal history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalBuffer'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /api/terminal-screen:
+    get:
+      tags:
+      - terminals
+      operationId: getTerminalScreen
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/TerminalId'
+      - name: stream_id
+        in: query
+        schema:
+          type: string
+      - name: after_seq
+        in: query
+        schema:
+          type: integer
+      - name: reason
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Authoritative terminal frame used for attach or recovery.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalFrame'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /api/codex-history:
+    get:
+      tags:
+      - conversations
+      operationId: listConversations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: include_archived
+        in: query
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: Canonical Codex conversations for the exact workspace cwd.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - conversations
+                properties:
+                  conversations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Conversation'
+  /api/codex-history/{thread_id}:
+    parameters:
+    - $ref: '#/components/parameters/ThreadIdPath'
+    patch:
+      tags:
+      - conversations
+      operationId: updateConversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdates'
+      responses:
+        '200':
+          description: Updated local conversation metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                properties:
+                  ok:
+                    type: boolean
+                  conversation:
+                    $ref: '#/components/schemas/Conversation'
+        '400':
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+      - conversations
+      operationId: updateConversationPost
+      deprecated: true
+      description: Same canonical update operation for clients unable to issue PATCH.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdates'
+      responses:
+        '200':
+          description: Updated local conversation metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files:
+    get:
+      tags:
+      - files
+      operationId: listWorkspaceFiles
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: dir
+        in: query
+        schema:
+          type: string
+          default: ''
+      responses:
+        '200':
+          description: Non-hidden entries in a workspace directory.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileListing'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files/read:
+    get:
+      tags:
+      - files
+      operationId: readWorkspaceFile
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/FilePath'
+      responses:
+        '200':
+          description: UTF-8 text file content and metadata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileContent'
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files/write:
+    post:
+      tags:
+      - files
+      operationId: writeWorkspaceFile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/WorkspaceFileSelector'
+              - type: object
+                required:
+                - content
+                properties:
+                  content:
+                    type: string
+      responses:
+        '200':
+          description: File was written.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileMutationResult'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files/create:
+    post:
+      tags:
+      - files
+      operationId: createWorkspaceFileEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/WorkspaceFileSelector'
+              - type: object
+                properties:
+                  is_dir:
+                    type: boolean
+                    default: false
+      responses:
+        '200':
+          description: Empty file or directory was created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                properties:
+                  ok:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files/upload:
+    post:
+      tags:
+      - files
+      operationId: uploadWorkspaceFile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - workspace_id
+              - file
+              properties:
+                workspace_id:
+                  type: string
+                dir:
+                  type: string
+                  default: ''
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Uploaded file metadata.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FileMutationResult'
+                - type: object
+                  properties:
+                    path:
+                      type: string
+                    name:
+                      type: string
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files/download:
+    get:
+      tags:
+      - files
+      operationId: downloadWorkspaceFile
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/FilePath'
+      responses:
+        '200':
+          description: File attachment.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /api/workspace-files/open-folder:
+    post:
+      tags:
+      - files
+      operationId: openWorkspaceFolder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - workspace_id
+              properties:
+                workspace_id:
+                  type: string
+                dir:
+                  type: string
+                  default: ''
+      responses:
+        '200':
+          description: Native file manager launch was requested.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - path
+                properties:
+                  ok:
+                    type: boolean
+                  path:
+                    type: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+  /api/workspace-observations:
+    get:
+      tags:
+      - observations
+      operationId: getWorkspaceObservations
+      parameters:
+      - name: workspace_id
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: One workspace observation or all workspace observations.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/workspace-observations/read:
+    post:
+      tags:
+      - observations
+      operationId: markWorkspaceObservationsRead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - workspace_id
+              properties:
+                workspace_id:
+                  type: string
+                terminal_id:
+                  type: string
+      responses:
+        '200':
+          description: Observation unread counters were cleared.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - ok
+                - workspace_id
+                properties:
+                  ok:
+                    type: boolean
+                  workspace_id:
+                    type: string
+                  terminal_id:
+                    type:
+                    - string
+                    - 'null'
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/hooks/report:
+    post:
+      tags:
+      - observations
+      operationId: reportHookEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - workspace_id
+              properties:
+                workspace_id:
+                  type: string
+                terminal_id:
+                  type: string
+                status:
+                  type: string
+                  enum:
+                  - running
+                  - done
+                  - failed
+                  - info
+                title:
+                  type: string
+                message:
+                  type: string
+      responses:
+        '200':
+          description: Hook event was recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          $ref: '#/components/responses/Error'
+  /api/workspaces/pin:
+    post:
+      summary: Persist workspace pin order
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid request
+        '409':
+          description: Unavailable or conflicting state
+  /api/workspace-terminals/agent:
+    post:
+      summary: Start the optional CLI in a dedicated PTY
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid request
+        '409':
+          description: Unavailable or conflicting state
+  /api/workspace-terminals/interrupt:
+    post:
+      summary: Send Ctrl-C; completion must be checked in terminal
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid request
+        '409':
+          description: Unavailable or conflicting state
+  /api/codex-history/{thread_id}/location:
+    get:
+      summary: Locate a local history entry
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid request
+        '409':
+          description: Unavailable or conflicting state
+  /api/codex-history/{thread_id}/read:
+    get:
+      summary: Read a bounded JSONL page without loading a runtime
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Invalid request
+        '409':
+          description: Unavailable or conflicting state
+components:
+  parameters:
+    WorkspaceId:
+      name: workspace_id
+      in: query
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    TerminalId:
+      name: terminal_id
+      in: query
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    ThreadIdPath:
+      name: thread_id
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    FilePath:
+      name: path
+      in: query
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  requestBodies:
+    WorkspaceSelector:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - workspace_id
+            properties:
+              workspace_id:
+                type: string
+                minLength: 1
+    TerminalSelector:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TerminalSelector'
+  responses:
+    Error:
+      description: Request failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: string
+    DirectoryListing:
+      type: object
+      required:
+      - path
+      - dirs
+      properties:
+        path:
+          type: string
+        parent:
+          type:
+          - string
+          - 'null'
+        dirs:
+          type: array
+          items:
+            type: object
+            required:
+            - name
+            - path
+            properties:
+              name:
+                type: string
+              path:
+                type: string
+    Workspace:
+      type: object
+      required:
+      - id
+      - name
+      - cwd
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        cwd:
+          type: string
+        source:
+          type: string
+        exists:
+          type: boolean
+        terminal:
+          $ref: '#/components/schemas/Terminal'
+        terminals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terminal'
+    Terminal:
+      type: object
+      required:
+      - id
+      - workspace_id
+      additionalProperties: true
+      properties:
+        id:
+          type: string
+        workspace_id:
+          type: string
+        name:
+          type: string
+        cwd:
+          type:
+          - string
+          - 'null'
+        alive:
+          type: boolean
+        usable:
+          type: boolean
+        pid:
+          type:
+          - integer
+          - 'null'
+        thread_id:
+          type:
+          - string
+          - 'null'
+        thread_title:
+          type:
+          - string
+          - 'null'
+    TerminalSelector:
+      type: object
+      required:
+      - workspace_id
+      - terminal_id
+      properties:
+        workspace_id:
+          type: string
+          minLength: 1
+        terminal_id:
+          type: string
+          minLength: 1
+    CreateTerminalCommand:
+      type: object
+      required:
+      - workspace_id
+      properties:
+        workspace_id:
+          type: string
+          minLength: 1
+        terminal_id:
+          type: string
+        name:
+          type: string
+          maxLength: 80
+        cols:
+          type: integer
+          minimum: 2
+          maximum: 1000
+        rows:
+          type: integer
+          minimum: 1
+          maximum: 500
+    TerminalCommandResult:
+      type: object
+      required:
+      - ok
+      - workspace
+      - terminal
+      properties:
+        ok:
+          type: boolean
+        workspace:
+          $ref: '#/components/schemas/Workspace'
+        terminal:
+          $ref: '#/components/schemas/Terminal'
+    TerminalBuffer:
+      type: object
+      required:
+      - workspace_id
+      - terminal_id
+      - buffer
+      - start
+      - end
+      - history_start
+      - history_end
+      additionalProperties: true
+      properties:
+        workspace_id:
+          type: string
+        terminal_id:
+          type: string
+        buffer:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
+        history_start:
+          type: integer
+        history_end:
+          type: integer
+        has_more:
+          type: boolean
+    TerminalFrame:
+      type: object
+      required:
+      - workspace_id
+      - terminal_id
+      - stream_id
+      - frame_seq
+      additionalProperties: true
+      properties:
+        workspace_id:
+          type: string
+        terminal_id:
+          type: string
+        stream_id:
+          type: string
+        stream_epoch:
+          type: integer
+        frame_seq:
+          type: integer
+        frame_end:
+          type: integer
+        screen_snapshot:
+          type: string
+        screen_snapshot_delta_safe:
+          type: boolean
+    Conversation:
+      type: object
+      required:
+      - threadId
+      - title
+      - timestamp
+      additionalProperties: true
+      properties:
+        threadId:
+          type: string
+        forkedFromId:
+          type:
+          - string
+          - 'null'
+        title:
+          type: string
+        rawTitle:
+          type: string
+        customTitle:
+          type:
+          - string
+          - 'null'
+        timestamp:
+          type: number
+        important:
+          type: boolean
+        archived:
+          type: boolean
+    ConversationUpdates:
+      type: object
+      properties:
+        title:
+          type:
+          - string
+          - 'null'
+          maxLength: 200
+        important:
+          type: boolean
+        archived:
+          type: boolean
+      minProperties: 1
+    FileEntry:
+      type: object
+      required:
+      - name
+      - path
+      - is_dir
+      - size
+      - modified
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        is_dir:
+          type: boolean
+        size:
+          type: integer
+          minimum: 0
+        modified:
+          type: string
+    FileListing:
+      type: object
+      required:
+      - workspace_id
+      - files
+      - current_dir
+      properties:
+        workspace_id:
+          type: string
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/FileEntry'
+        current_dir:
+          type: string
+        parent_dir:
+          type:
+          - string
+          - 'null'
+    FileContent:
+      type: object
+      required:
+      - content
+      - size
+      - modified
+      properties:
+        content:
+          type: string
+        size:
+          type: integer
+          minimum: 0
+        modified:
+          type: string
+    WorkspaceFileSelector:
+      type: object
+      required:
+      - workspace_id
+      - path
+      properties:
+        workspace_id:
+          type: string
+          minLength: 1
+        path:
+          type: string
+          minLength: 1
+    FileMutationResult:
+      type: object
+      required:
+      - ok
+      properties:
+        ok:
+          type: boolean
+        size:
+          type: integer
+          minimum: 0
+        modified:
+          type: string

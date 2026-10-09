@@ -1,0 +1,182 @@
+asyncapi: 3.0.0
+info:
+  title: codexws terminal Socket.IO protocol
+  version: 1.0.0-current
+  description: |
+    Application events for terminal transport. Ordering, attach, and recovery
+    semantics are defined in ../terminal-sync-protocol.md.
+channels:
+  terminal_attach:
+    address: terminal_attach
+    messages:
+      attach: { $ref: '#/components/messages/TerminalAttach' }
+  terminal_input:
+    address: terminal_input
+    messages:
+      input: { $ref: '#/components/messages/TerminalInput' }
+  terminal_snapshot:
+    address: terminal_snapshot
+    messages:
+      snapshot: { $ref: '#/components/messages/TerminalSnapshot' }
+  terminal_resize:
+    address: terminal_resize
+    messages:
+      resize: { $ref: '#/components/messages/TerminalResize' }
+  terminal_resize_workspace:
+    address: terminal_resize_workspace
+    messages:
+      resizeWorkspace: { $ref: '#/components/messages/TerminalResize' }
+  terminal_ready:
+    address: terminal_ready
+    messages:
+      ready: { $ref: '#/components/messages/TerminalFrame' }
+  terminal_output:
+    address: terminal_output
+    messages:
+      output: { $ref: '#/components/messages/TerminalOutput' }
+  terminal_frame:
+    address: terminal_frame
+    messages:
+      frame: { $ref: '#/components/messages/TerminalFrame' }
+  terminal_exit:
+    address: terminal_exit
+    messages:
+      exit: { $ref: '#/components/messages/TerminalExit' }
+  terminal_error:
+    address: terminal_error
+    messages:
+      error: { $ref: '#/components/messages/TerminalError' }
+operations:
+  receiveTerminalAttach:
+    action: receive
+    channel: { $ref: '#/channels/terminal_attach' }
+  receiveTerminalInput:
+    action: receive
+    channel: { $ref: '#/channels/terminal_input' }
+  receiveTerminalSnapshot:
+    action: receive
+    channel: { $ref: '#/channels/terminal_snapshot' }
+  receiveTerminalResize:
+    action: receive
+    channel: { $ref: '#/channels/terminal_resize' }
+  receiveWorkspaceResize:
+    action: receive
+    channel: { $ref: '#/channels/terminal_resize_workspace' }
+  sendTerminalReady:
+    action: send
+    channel: { $ref: '#/channels/terminal_ready' }
+  sendTerminalOutput:
+    action: send
+    channel: { $ref: '#/channels/terminal_output' }
+  sendTerminalFrame:
+    action: send
+    channel: { $ref: '#/channels/terminal_frame' }
+  sendTerminalExit:
+    action: send
+    channel: { $ref: '#/channels/terminal_exit' }
+  sendTerminalError:
+    action: send
+    channel: { $ref: '#/channels/terminal_error' }
+components:
+  messages:
+    TerminalAttach:
+      payload: { $ref: '#/components/schemas/TerminalAttachPayload' }
+    TerminalInput:
+      payload: { $ref: '#/components/schemas/TerminalInputPayload' }
+    TerminalSnapshot:
+      payload: { $ref: '#/components/schemas/TerminalSnapshotPayload' }
+    TerminalResize:
+      payload: { $ref: '#/components/schemas/TerminalResizePayload' }
+    TerminalFrame:
+      payload: { $ref: '#/components/schemas/TerminalFramePayload' }
+    TerminalOutput:
+      payload: { $ref: '#/components/schemas/TerminalOutputPayload' }
+    TerminalExit:
+      payload: { $ref: '#/components/schemas/TerminalExitPayload' }
+    TerminalError:
+      payload: { $ref: '#/components/schemas/TerminalErrorPayload' }
+  schemas:
+    TerminalSelector:
+      type: object
+      required: [workspace_id, terminal_id]
+      properties:
+        workspace_id: { type: string }
+        terminal_id: { type: string }
+    TerminalAttachPayload:
+      allOf:
+        - $ref: '#/components/schemas/TerminalSelector'
+        - type: object
+          required: [attach_seq, cols, rows]
+          properties:
+            attach_seq: { type: integer, minimum: 1 }
+            cols: { type: integer, minimum: 2, maximum: 1000 }
+            rows: { type: integer, minimum: 1, maximum: 500 }
+            replay_limit: { type: integer, minimum: 0 }
+            claim_geometry: { type: boolean }
+            sync_workspace_geometry: { type: boolean }
+            view_only: { type: boolean }
+    TerminalInputPayload:
+      type: object
+      required: [attach_seq, data]
+      properties:
+        attach_seq: { type: integer, minimum: 1 }
+        data: { type: string }
+    TerminalSnapshotPayload:
+      type: object
+      required: [attach_seq, snapshot, snapshot_end, cols, rows]
+      properties:
+        attach_seq: { type: integer, minimum: 1 }
+        snapshot: { type: string }
+        snapshot_end: { type: integer, minimum: 0 }
+        cols: { type: integer, minimum: 2 }
+        rows: { type: integer, minimum: 1 }
+    TerminalResizePayload:
+      type: object
+      required: [attach_seq, cols, rows]
+      properties:
+        attach_seq: { type: integer, minimum: 1 }
+        cols: { type: integer, minimum: 2, maximum: 1000 }
+        rows: { type: integer, minimum: 1, maximum: 500 }
+        claim_geometry: { type: boolean }
+    TerminalFramePayload:
+      allOf:
+        - $ref: '#/components/schemas/TerminalSelector'
+        - type: object
+          required: [stream_id, stream_epoch, frame_seq, frame_end]
+          additionalProperties: true
+          properties:
+            attach_seq: { type: integer }
+            stream_id: { type: string }
+            stream_epoch: { type: integer }
+            frame_seq: { type: integer }
+            frame_end: { type: integer }
+            screen_snapshot: { type: string }
+            screen_snapshot_delta_safe: { type: boolean }
+    TerminalOutputPayload:
+      allOf:
+        - $ref: '#/components/schemas/TerminalSelector'
+        - type: object
+          required: [stream_id, stream_epoch, frame_seq, output_start, output_end, data]
+          properties:
+            stream_id: { type: string }
+            stream_epoch: { type: integer }
+            frame_seq: { type: integer }
+            output_start: { type: integer }
+            output_end: { type: integer }
+            history_start: { type: integer }
+            event_type: { type: string, enum: [output, resize] }
+            data: { type: string }
+            cols: { type: integer }
+            rows: { type: integer }
+    TerminalExitPayload:
+      allOf:
+        - $ref: '#/components/schemas/TerminalSelector'
+        - type: object
+          properties:
+            stream_id: { type: string }
+            stream_epoch: { type: integer }
+    TerminalErrorPayload:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }

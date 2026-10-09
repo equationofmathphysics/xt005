@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>xt005 · PTY Workspace</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/.cdnlocal/xterm/5.3.0/xterm.css">
+<link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="top-nav">
+  <div class="tool-bar active" id="termToolBar">
+    <div class="workspace-row">
+      <div class="workspace-cluster toolbar-section">
+        <span class="toolbar-kicker">WS</span>
+        <div class="workspace-switch" id="workspaceSwitch"></div>
+      </div>
+      <div class="top-actions">
+        <button class="toolbar-btn" onclick="showWorkspaceModal()">新增工作区</button>
+        <button class="toolbar-btn" type="button" id="terminalFullscreenBtn" onclick="toggleTerminalFullscreen()" aria-pressed="false">大屏</button>
+      </div>
+    </div>
+    <div class="terminal-session-bar terminal-nav-row">
+      <span class="toolbar-kicker">终端</span>
+      <div class="terminal-tabs" id="terminalTabs"></div>
+      <div class="terminal-session-actions">
+        <button class="toolbar-btn" type="button" onclick="createTerminalSession()">+ 终端</button>
+        <button class="toolbar-btn" onclick="startOptionalAgent()">+ Codex</button>
+        <button class="toolbar-btn" onclick="interruptActiveTerminal()">中断</button>
+        <button class="toolbar-btn" onclick="closeTerminalSession(activeTerminalId)">卸载</button>
+        <button class="toolbar-btn" onclick="openTerminalDraft()">草稿</button>
+        <button class="toolbar-btn" type="button" id="pageFullscreenBtn" onclick="togglePageFullscreen()" aria-pressed="false">页面全屏</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 终端面板 -->
+<div class="panel active" id="terminalPanel">
+  <div style="display:flex;flex:1;overflow:hidden;">
+    <div class="codex-sidebar" id="codexSidebar">
+      <div class="codex-sidebar-header">
+        <h3 id="sidebarTitle">Codex History</h3>
+        <div class="codex-sidebar-actions">
+          <button class="sidebar-icon-btn" type="button" onclick="refreshSidePane()" title="刷新" aria-label="刷新">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M20 6v5h-5"/>
+              <path d="M4 18v-5h5"/>
+              <path d="M18.5 9.2A7 7 0 0 0 6.4 6.6L4 9"/>
+              <path d="M5.5 14.8a7 7 0 0 0 12.1 2.6L20 15"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="sidebar-mode-tabs">
+        <button class="side-mode active" type="button" data-side-mode="history">History</button>
+        <button class="side-mode" type="button" data-side-mode="workspaceFiles">Workspace Files</button>
+      </div>
+      <div class="sidebar-pane active" id="historyPane">
+        <div class="codex-history-list" id="codexHistoryList">
+          <div class="codex-history-empty">加载中...</div>
+        </div>
+      </div>
+      <div class="sidebar-pane" id="workspaceFilesPane">
+        <div class="workspace-file-tools">
+          <button class="toolbar-btn" type="button" onclick="openWorkspaceFolder()">打开文件夹</button>
+          <button class="toolbar-btn" type="button" onclick="triggerWorkspaceUpload()">上传到工作区</button>
+          <input id="workspaceUploadInput" type="file" hidden>
+        </div>
+        <div class="codex-history-list" id="workspaceFileList">
+          <div class="codex-history-empty">加载中...</div>
+        </div>
+      </div>
+      <div class="sidebar-status-dock">
+        <div class="sidebar-status-head">
+          <span class="sidebar-status-title">服务状态</span>
+          <span class="sidebar-status-actions">
+            <button class="toolbar-btn" type="button" onclick="showWorkspaceObservations()">详情</button>
+          </span>
+        </div>
+        <div class="mini-status-line connection-chip disconnected" id="termConnection">
+          <span class="mini-status-label">连接</span>
+          <span class="mini-status-value">
+            <span class="terminal-status disconnected" id="termStatus"></span>
+            <span class="chip-value" id="termStatusText">未连接</span>
+          </span>
+        </div>
+        <div class="mini-status-line">
+          <span class="mini-status-label">路径</span>
+          <span class="mini-status-value" id="termCwdLabel">--</span>
+        </div>
+        <div class="mini-status-line">
+          <span class="mini-status-label">终端</span>
+          <span class="mini-status-value" id="terminalCountLabel">--</span>
+        </div>
+        <div class="stats-bar" aria-label="系统资源">
+          <span class="resource-chip cpu"><span class="stat-label">CPU</span><span class="stat-value" id="cpuStat">--</span></span>
+          <span class="resource-chip mem"><span class="stat-label">内存</span><span class="stat-value" id="memStat">--</span></span>
+          <span class="resource-chip rss"><span class="stat-label">进程</span><span class="stat-value" id="procStat">--</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="terminal-panel active" id="terminalWorkArea" style="flex:1;">
+      <div id="terminalContainer"></div>
+      <aside class="terminal-prompt-navigator" id="terminalPromptNavigator" aria-label="用户输入导航" aria-hidden="true" hidden>
+        <div class="terminal-prompt-rail" id="terminalPromptRail" role="list"></div>
+        <div class="terminal-prompt-popover" id="terminalPromptPopover">
+          <div class="terminal-prompt-list" id="terminalPromptList" role="list"></div>
+        </div>
+      </aside>
+    </div>
+    <div class="workspace-editor-area" id="workspaceEditorArea">
+      <div class="editor-toolbar">
+        <span class="file-path" id="workspaceFilePath"></span>
+        <button class="toolbar-btn" onclick="showTerminalArea()">终端</button>
+        <button class="toolbar-btn" onclick="reloadWorkspaceFile()">重新加载</button>
+        <button class="toolbar-btn" onclick="downloadWorkspaceFile()">下载</button>
+        <button class="toolbar-btn save" onclick="saveWorkspaceFile()">保存</button>
+      </div>
+      <div class="editor-wrapper">
+        <textarea id="workspaceEditor" spellcheck="false"></textarea>
+      </div>
+      <div class="status-bar">
+        <span id="workspaceStatusSize"></span>
+        <span id="workspaceStatusModified"></span>
+        <span id="workspaceStatusChars"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 终端大屏 -->
+<div class="terminal-big-screen" id="terminalBigScreen" aria-hidden="true">
+  <div class="big-screen-header">
+    <div class="big-screen-title">
+      <span>终端大屏</span>
+      <span id="bigScreenSummary">等待检测</span>
+    </div>
+    <div class="big-screen-actions">
+      <div class="big-screen-focus-actions" id="bigScreenFocusActions" hidden>
+        <button class="toolbar-btn" type="button" onclick="setBigScreenFocus('')">九宫格</button>
+        <button class="big-screen-icon-btn" id="bigScreenPreviousBtn" type="button" onclick="cycleBigScreenFocus(-1)" title="上一个终端" aria-label="上一个终端">
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="big-screen-icon-btn" id="bigScreenNextBtn" type="button" onclick="cycleBigScreenFocus(1)" title="下一个终端" aria-label="下一个终端">
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+      <button class="toolbar-btn" type="button" onclick="refreshBigScreenTerminals()">刷新</button>
+      <button class="toolbar-btn save" type="button" onclick="setTerminalFullscreen(false)">退出大屏</button>
+    </div>
+  </div>
+  <div class="big-screen-grid" id="bigScreenGrid"></div>
+</div>
+
+<!-- 注册工作区弹窗 -->
+<div class="modal-overlay" id="workspaceModal" style="display:none;">
+  <div class="modal">
+    <h3>新增工作区</h3>
+    <div class="modal-tabs">
+      <button class="modal-tab active" type="button" data-workspace-mode="import">导入已有目录</button>
+      <button class="modal-tab" type="button" data-workspace-mode="create">新建目录</button>
+    </div>
+    <input id="workspaceName" placeholder="显示名，可留空">
+    <input id="workspacePath" placeholder="目录路径，例如 /home/t/project">
+    <div class="path-browser" id="workspaceBrowser">
+      <div class="path-browser-head">
+        <button class="toolbar-btn" type="button" onclick="browseWorkspaceParent()" style="padding:4px 8px;font-size:11px;">上级</button>
+        <span id="workspaceBrowserPath"></span>
+      </div>
+      <div class="path-browser-list" id="workspaceBrowserList"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="toolbar-btn" onclick="hideWorkspaceModal()">取消</button>
+      <button class="toolbar-btn save" id="workspaceSubmitBtn" onclick="registerWorkspace()">导入并打开</button>
+    </div>
+  </div>
+</div>
+
+<!-- 工作区观测状态 -->
+<div class="modal-overlay" id="observationModal" style="display:none;">
+  <div class="modal observation-modal">
+    <h3 id="observationTitle">工作区状态</h3>
+    <div class="observation-body" id="observationBody"></div>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="toolbar-btn save" onclick="hideWorkspaceObservations()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script src="/.cdnlocal/xterm/5.3.0/xterm.js"></script>
+<script src="/.cdnlocal/xterm-addon-fit/0.8.0/xterm-addon-fit.js"></script>
+<script src="/.cdnlocal/xterm-addon-serialize/0.11.0/xterm-addon-serialize.js"></script>
+<script src="/.cdnlocal/socket.io/4.7.2/socket.io.min.js"></script>
+
+<script src="/assets/app-socket.js"></script>
+<script src="/assets/app-api.js"></script>
+<script src="/assets/app-core.js"></script>
+<script src="/assets/app-workspaces.js"></script>
+<script src="/assets/app-sidepane.js"></script>
+<script src="/assets/app-bigscreen.js"></script>
+<script src="/assets/app-terminal.js"></script>
+<script src="/assets/app-prompt-nav.js"></script>
+<script src="/assets/app-history.js"></script>
+<script src="/assets/drafts.js"></script>
+<script src="/assets/app-pty-controls.js"></script>
+<script src="/assets/app-bootstrap.js"></script>
+</body>
+</html>

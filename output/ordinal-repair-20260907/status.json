@@ -1,0 +1,102 @@
+{
+  "status": "complete",
+  "thread_id": "01a079e6-b8e1-7b50-966e-a911c2ceacc3",
+  "phase": "complete",
+  "updated_at": "2026-09-07 20:04:26 +0800",
+  "repair": {
+    "changed_records": 219,
+    "duplicate_boundaries": [
+      {
+        "suffix_line": 1,
+        "old_ordinal": 3000
+      }
+    ],
+    "indexed_prefix_bytes": 14781554,
+    "next_ordinal": 3220,
+    "thread_id": "01a079e6-b8e1-7b50-966e-a911c2ceacc3",
+    "rollout": "/home/t/.codex/sessions/2026/09/07/rollout-2026-09-07T11-25-58-01a079e6-b8e1-7b50-966e-a911c2ceacc3.jsonl",
+    "applied": true,
+    "original_sha256": "772b4a309105cde65e006635c6bcf8a42bb9284e9a8c7209186f772ad2fe1f38",
+    "corrected_sha256": "41b47ee88fbc48d1338d4fa2f094282543a0b9745fc41a6b98f0b0add78a30fb",
+    "backup_dir": "/home/t/.codex/repair-backups/20260907-ordinal-01a079e6"
+  },
+  "indexed_turns": [
+    [
+      "01a07bad-c663-7bc2-8ba7-ecd229791bac",
+      "completed"
+    ],
+    [
+      "01a07bad-719b-7b11-b639-ddc56bbd0568",
+      "interrupted"
+    ],
+    [
+      "01a07ba0-b393-7d70-9680-a1da959faebf",
+      "completed"
+    ],
+    [
+      "01a07b35-0bfe-7ac0-b360-191f891cb576",
+      "inProgress"
+    ],
+    [
+      "01a07b2a-8f4e-73d2-9e92-a09ffec99e9f",
+      "completed"
+    ],
+    [
+      "01a07b1f-8e39-7330-8c87-37dd68b416a7",
+      "completed"
+    ],
+    [
+      "01a07b15-b599-7740-a688-4bea8299dc54",
+      "completed"
+    ],
+    [
+      "01a07b0a-992c-7271-a1bd-5550a8ac5c41",
+      "completed"
+    ]
+  ],
+  "checkpoint": [
+    15303653,
+    3220
+  ],
+  "rollout_bytes": 15303653,
+  "api_turns": [
+    [
+      "01a07bad-c663-7bc2-8ba7-ecd229791bac",
+      "completed"
+    ],
+    [
+      "01a07bad-719b-7b11-b639-ddc56bbd0568",
+      "interrupted"
+    ],
+    [
+      "01a07ba0-b393-7d70-9680-a1da959faebf",
+      "completed"
+    ],
+    [
+      "01a07b35-0bfe-7ac0-b360-191f891cb576",
+      "interrupted"
+    ],
+    [
+      "01a07b2a-8f4e-73d2-9e92-a09ffec99e9f",
+      "completed"
+    ],
+    [
+      "01a07b1f-8e39-7330-8c87-37dd68b416a7",
+      "completed"
+    ],
+    [
+      "01a07b15-b599-7740-a688-4bea8299dc54",
+      "completed"
+    ],
+    [
+      "01a07b0a-992c-7271-a1bd-5550a8ac5c41",
+      "completed"
+    ]
+  ],
+  "browser": {
+    "initialLoad": true,
+    "afterReload": true,
+    "matchingAnswers": 1
+  },
+  "verification_note": "Retried browser verification using Node v24; system unit had selected an older Node."
+}

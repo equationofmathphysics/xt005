@@ -1,0 +1,17 @@
+[Unit]
+Description=xt005 workspace server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=@WORKING_DIRECTORY@
+Environment="ENV_FILE=@ENV_FILE@"
+ExecStart="@INSTALL_DIR@/run.sh"
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=60
+
+[Install]
+WantedBy=default.target

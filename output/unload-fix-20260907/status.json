@@ -1,0 +1,20 @@
+{
+  "status": "complete",
+  "production_unload": {
+    "referenced": false,
+    "released": true,
+    "releasedPages": 0,
+    "status": "notLoaded",
+    "threadId": "01a079e6-b8e1-7b50-966e-a911c2ceacc3",
+    "writeLockReleased": true
+  },
+  "browser": {
+    "initialLoad": true,
+    "afterReload": true,
+    "color": {
+      "color": "rgb(187, 164, 232)",
+      "text": "[文件](/tmp/example.py:6)",
+      "clickable": false
+    }
+  }
+}

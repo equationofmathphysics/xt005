@@ -1,0 +1,11 @@
+{
+  "changed_records": 219,
+  "duplicate_boundaries": [
+    {
+      "suffix_line": 1,
+      "old_ordinal": 3000
+    }
+  ],
+  "indexed_prefix_bytes": 14781554,
+  "next_ordinal": 3220
+}

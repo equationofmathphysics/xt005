@@ -1,0 +1,11 @@
+class TerminalSocketEvent:
+    ATTACH = "terminal_attach"
+    INPUT = "terminal_input"
+    SNAPSHOT = "terminal_snapshot"
+    RESIZE = "terminal_resize"
+    RESIZE_WORKSPACE = "terminal_resize_workspace"
+    READY = "terminal_ready"
+    OUTPUT = "terminal_output"
+    FRAME = "terminal_frame"
+    EXIT = "terminal_exit"
+    ERROR = "terminal_error"

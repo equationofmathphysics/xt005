@@ -1,0 +1,15 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>工作区抢救台</title>
+<style>body{margin:40px auto;max-width:1000px;padding:0 20px;background:#111725;color:#e8ecf4;font:16px system-ui}h1{font-size:28px}section{padding:20px;background:#1b2638;margin:20px 0;border-radius:12px}button,input{font:inherit;padding:10px;margin:5px;border-radius:6px}button{cursor:pointer;background:#b9d8ff;border:0;color:#15213a}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:45vh;overflow:auto}input{max-width:90%}.hint{color:#a7b6cc}</style>
+<h1>工作区抢救台</h1><p class="hint">主服务停机时，此页面仍可查看日志和恢复服务。重启会结束主服务中的终端进程。</p>
+<section><label>管理令牌 <input id="token" type="password" autocomplete="off"></label><button id="connect">连接</button><p id="message" role="status"></p></section>
+<section><h2>主服务</h2><div id="actions"><button data-action="start">启动</button><button data-action="stop">停止</button><button data-action="restart">重启</button></div><pre id="status">等待连接</pre></section>
+<section><h2>更新与回退</h2><label>Git 版本 <input id="ref" value="HEAD" placeholder="HEAD 或 origin/main"></label><button data-action="update">准备并更新</button><button data-action="rollback">回退上一版</button><p class="hint">先在独立目录准备版本，验证后切换。源工作区有未提交改动时拒绝更新。</p><pre id="job"></pre></section>
+<section><h2>日志</h2><button id="logs">刷新日志</button><pre id="output"></pre></section>
+<script>
+const $=id=>document.getElementById(id);let connected=false;
+async function api(path,body){const r=await fetch(path,{method:body?'POST':'GET',headers:{Authorization:'Bearer '+$('token').value,...(body?{'Content-Type':'application/json'}:{})},...(body?{body:JSON.stringify(body)}:{})});const data=await r.json();if(!r.ok)throw Error(data.error||r.statusText);return data}
+async function refresh(){try{const data=await api('/api/status');$('status').textContent=data.service;$('job').textContent=JSON.stringify(data.job,null,2);connected=true;$('message').textContent='已连接独立抢救服务'}catch(e){connected=false;$('message').textContent=e.message}}
+$('connect').onclick=refresh;$('logs').onclick=async()=>{try{const d=await api('/api/logs');$('output').textContent=d.journal+'\n\n操作记录\n'+d.operation}catch(e){$('message').textContent=e.message}};
+document.querySelectorAll('[data-action]').forEach(button=>button.onclick=async()=>{const action=button.dataset.action;if(action!=='start'&&!confirm(button.textContent+'？运行中的终端任务可能中断。'))return;button.disabled=true;try{await api('/api/action',{action,ref:$('ref').value});await refresh()}catch(e){$('message').textContent=e.message}finally{button.disabled=false}});
+setInterval(()=>{if(connected)refresh()},3000);
+</script></html>
