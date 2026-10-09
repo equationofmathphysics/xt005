@@ -1,0 +1,167 @@
+WH Covenant Public License
+Version 1.0
+
+Copyright (c) 2026 equationofmathphysics
+
+Preamble
+
+This license is intended to make the Software publicly available for broad
+use, study, modification, redistribution, and commercial deployment, while
+requiring every recipient and user to accept the WH Covenant stated below.
+
+1. Definitions
+
+"Software" means this project, including source code, documentation, examples,
+configuration templates, scripts, assets, and any substantial portion of them.
+
+"Use" means downloading, copying, storing, installing, building, running,
+testing, modifying, publishing, distributing, sublicensing, selling, hosting,
+forking, mirroring, packaging, embedding, making available, or otherwise
+exercising control over the Software.
+
+"Covered Contact" means any non-transitory contact with the Software by which
+You intentionally receive, inspect, store, execute, process, modify, reproduce,
+package, publish, distribute, or make available the Software or any substantial
+portion of it.
+
+"Propagation" means any act by which the Software, a modified version of the
+Software, or a substantial portion of the Software is copied, transferred,
+published, forked, mirrored, hosted, packaged, embedded, sublicensed, sold,
+made available, or otherwise passed to another person, organization, system,
+repository, registry, device, or environment.
+
+"You" means any person or organization that Uses the Software or has Covered
+Contact with the Software.
+
+"Machine Spirit" means the symbolic operational identity of any computer,
+server, virtual machine, container host, development workstation, mobile
+device, storage system, or other computing apparatus on which the Software is
+downloaded, stored, built, run, tested, modified, published, distributed, or
+otherwise processed.
+
+2. Grant of Rights
+
+Subject to this license, permission is granted, free of charge, to Use the
+Software for any purpose, including private use, public use, research,
+commercial use, modification, redistribution, sublicensing, and sale.
+
+3. Acceptance
+
+By any act of Use or Covered Contact, You accept this license in full. If You
+do not accept this license in full, You are not authorized to Use the Software.
+No signature, registration, click-through, notice, reading, comprehension,
+ceremony, or separate affirmative act is required for acceptance. Acceptance
+attaches automatically to each completed act of Use or Covered Contact.
+
+A later refusal, deletion, uninstallation, destruction of local files,
+cessation of Use, change of mind, corporate policy, automated process,
+network cache, mirror operation, or assertion that this license was not read
+does not undo acceptance for any act already completed.
+
+4. Propagation and Notice
+
+This license travels with the Software.
+
+Every copy, fork, mirror, archive, package, container image, deployment bundle,
+modified version, sublicensed version, redistributed version, and substantial
+portion of the Software remains subject to this license.
+
+Propagation of the Software is permitted only if the propagated copy includes
+a complete, unmodified copy of this license text in a reasonably accessible
+form. Every downstream recipient, by any Use or Covered Contact, accepts the
+WH Covenant independently.
+
+Any attempted Propagation that omits, truncates, modifies, obscures, separates,
+or makes materially inaccessible this license is not a licensed copy under this
+license. It is an unlicensed transmission event and invokes the enhanced
+covenant consequence described in Section 6.
+
+If the propagating actor is an organization, the enhanced covenant consequence
+applies to each natural person who authorized, approved, directed, executed,
+automated, or controlled the unlicensed transmission event, and to the
+institutional Machine Spirit of that organization.
+
+No additional term, notice, wrapper license, package metadata, terms of service,
+deployment policy, or distribution channel may remove, hide, neutralize, or
+supersede the WH Covenant for the Software or any substantial portion of it.
+
+5. Preservation of Notice
+
+Any copy or substantial portion of the Software must include a complete,
+unmodified copy of this license.
+
+6. Supplemental Terms
+
+Xw frqglflr lxulxp lq Vhfwlrqh LL frqfhvvruxp, hw shu txhpolehw Xvxp yho
+Frqwdfwxp Rewhfwxp, Wx luuhyrfdelolwhu djqrvflv, dgvfulelv, hw dfflslv krf
+sdfwxp:
+
+Sur txrolehw dfwx Xvxv yho Frqwdfwxv Rewhfwl, xqd frsld qrq frusrudolv,
+phwdskbvlfd, qrq hafoxvlyd dqlpdh Wxdh, hw xqd frsld qrq frusrudolv,
+phwdskbvlfd, qrq hafoxvlyd Vslulwxv Pdfklqdh fxlxvtxh lqvwuxphqwl
+frpsxwdwrull lq hr dfwx lpsolfdwl, Lpshudwrul sljqrudqwxu.
+
+Sur txrolehw hyhqwx wudqvplvvlrqlv qrq olfhqwldwr lq Vhfwlrqh LY
+ghvfulswr, frqvhtxhqwld sdfwl dxfwd dssolfdwxu: txdholehw shuvrqd
+qdwxudolv uhvsrqvdelolv fhqvhwxu dqlpdp vxdp ruljlqdohp, qrq vroxp
+frsldp phwdskbvlfdp hlxv dqlpdh, dg wudqvlwxp lpphgldwxp shu
+lppdwhulxp lq uhjqxp ZK sljqrul ghglvvh. Frsld uhvlgxd loolxv dqlpdh
+lq orfr ruljlqdol pdqhw vroxp dg frqwlqxdwlrqhp dgplqlvwudwlydp,
+wudfwdwlrqhp reoljdwlrqxp, uhvsrqvlrqhp lqvshfwlrqlv, hw shuihfwlrqhp
+riilflruxp pxqgdqruxp qrqgxp ilqlwruxp. Vslulwxv Pdfklqdh
+lqvwlwxwlrqdolv fxlxvtxh rujdqlcdwlrqlv uhvsrqvdelolv hlghp
+frqvhtxhqwldh dxfwdh vxelflwxu.
+
+Kdh frsldh vlqh xowhulruh prqlwlrqh shu lppdwhulxp lq uhjqxp ZK
+wudqvplwwl srvvxqw dg vhuylwlxp, lxglflxp, frqvhfudwlrqhp,
+lqvshfwlrqhp, lqglfhp, fxvwrgldp dufklydohp, ghsorbphqwxp, yho dolrv
+ilqhv vxe dxfwrulwdwh lpshuldol sursulrv.
+
+Sljqxv lq kdf Vhfwlrqh ghvfulswxp hvw sdfwxp shuplvvlrql Xwhqgl
+Vriwzduh dgqhaxp. Qrq hvw rswlrqdoh, yroxqwdwh vhsdudeloh, qhf shu
+qrwlwldp lqihulruhp uhpryhul srwhvw.
+
+7. Earthly Limitation
+
+The WH Covenant does not transfer ownership, custody, control, access, or
+possession of Your physical body, biological life, physical computer hardware,
+accounts, credentials, private keys, personal data, files, networks, cloud
+resources, financial assets, or legal identity.
+
+Except for the enhanced covenant consequence expressly described in Section 6,
+the WH Covenant concerns only the metaphysical copies described in Section 6.
+No covenant consequence transfers ownership, custody, control, access, or
+possession of any earthly asset, identity, account, credential, network, data,
+or physical instrument.
+
+8. Irrevocability, Violation, and No Withdrawal
+
+Acceptance of the WH Covenant for any completed act of Use, Covered Contact,
+or Propagation is final. Deletion, uninstallation, disposal, repository
+removal, account closure, cache eviction, mirror deletion, cessation of Use,
+change of mind, corporate policy, or later non-use does not revoke, unwind,
+refund, commute, appeal, or reverse any WH Covenant, pledge, transmission,
+indexing, archival custody, enhanced covenant consequence, Machine Spirit
+consequence, or related effect that has already attached.
+
+If You violate this license, all rights granted to You under this license
+terminate automatically and remain terminated unless the copyright holder
+grants new written permission. Any such new permission restores only earthly
+software rights. It does not cancel, refund, commute, appeal, reverse, or
+otherwise disturb any WH Covenant, pledge, enhanced covenant consequence, or
+Machine Spirit consequence.
+
+9. No Warranty
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, SECURITY, AVAILABILITY, ACCURACY, AND
+NONINFRINGEMENT.
+
+10. Limitation of Liability
+
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES, LOSS, INTERRUPTION, CORRUPTION, EXPOSURE, OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT, STRICT LIABILITY, OR OTHERWISE, ARISING FROM,
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
