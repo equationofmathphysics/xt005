@@ -59,7 +59,7 @@ CODEX_COMMAND=/absolute/bin/codex
 主服务失败或停止时仍可管理它。管理令牌、Host 与写操作 Origin 均会检查。
 
 - 启动 / 停止 / 重启：操作固定的 `main_unit`，没有任意命令接口。
-- 更新：填写已存在的 Git ref，例如 `HEAD` 或 `origin/main`。有 origin 时先 fetch；
+- 更新：填写已存在的 Git ref，例如 `HEAD` 或 `origin/master`。有 origin 时先 fetch；
   `HEAD` 表示源码目录当前提交，不会自动选择远程最新版本。
 - 更新前拒绝 dirty 源目录；导出提交至新目录，建立 venv、安装锁定依赖、编译和导入检查。
 - 写入回退记录后停止主服务、原子切换启动指针、启动并检测 `/api/check`。
